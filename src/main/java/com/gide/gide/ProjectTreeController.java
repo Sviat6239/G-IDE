@@ -5,6 +5,11 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import java.io.ObjectOutputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.FileInputStream;
+import java.io.Serializable;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +20,8 @@ public class ProjectTreeController {
     private TreeView<String> projectTree;
     @FXML
     private TextField searchField;
+
+    private static final String TREE_STATE_FILE = "tree_state.ser";
 
     @FXML
     public void initialize() {
@@ -120,6 +127,25 @@ public class ProjectTreeController {
             TreeItem<String> rootItem = new TreeItem<>(selectedDirectory.getName());
             createTree(selectedDirectory, rootItem);
             projectTree.setRoot(rootItem);
+        }
+    }
+
+    @FXML
+    private void saveTreeState() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TREE_STATE_FILE))) {
+            oos.writeObject(projectTree.getRoot());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void loadTreeState() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TREE_STATE_FILE))) {
+            TreeItem<String> root = (TreeItem<String>) ois.readObject();
+            projectTree.setRoot(root);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
