@@ -1,8 +1,11 @@
 package com.gide.gide;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -14,6 +17,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.Desktop;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +81,9 @@ public class ProjectSelectionController {
                 stage.setTitle("Project - " + selectedProject);
                 stage.setScene(scene);
                 stage.show();
+
+                Stage currentStage = (Stage) projectList.getScene().getWindow();
+                currentStage.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -135,11 +142,33 @@ public class ProjectSelectionController {
                 MenuItem deleteItem = new MenuItem("Delete Project");
                 deleteItem.setOnAction(e -> deleteProject());
 
-                contextMenu.getItems().addAll(renameItem, deleteItem);
+                MenuItem openInExplorerItem = new MenuItem("Open in Explorer");
+                openInExplorerItem.setOnAction(e -> openInExplorer());
+
+                contextMenu.getItems().addAll(renameItem, deleteItem, openInExplorerItem);
                 contextMenu.show(projectList, event.getScreenX(), event.getScreenY());
             }
         } else if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
             openProject();
+        }
+    }
+
+    @FXML
+    private void openInExplorer() {
+        String selectedProject = projectList.getSelectionModel().getSelectedItem();
+        if (selectedProject != null) {
+            Path projectPath = Paths.get(projectLocationField.getText(), selectedProject);
+            if (Files.exists(projectPath) && Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().open(projectPath.toFile());
+                } catch (IOException e) {
+                    showErrorDialog("Error", "Could not open project in Explorer.", e);
+                }
+            } else {
+                showErrorDialog("Error", "Project directory does not exist or Desktop is not supported.", null);
+            }
+        } else {
+            showErrorDialog("Error", "No project selected.", null);
         }
     }
 
@@ -191,5 +220,34 @@ public class ProjectSelectionController {
                 e.printStackTrace();
             }
         }
+    }
+
+    @FXML
+    private void openInExplorer(ActionEvent event) {
+        String selectedProject = projectList.getSelectionModel().getSelectedItem();
+        if (selectedProject != null) {
+            File projectDir = new File(selectedProject);
+            if (projectDir.exists() && Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().open(projectDir);
+                } catch (IOException e) {
+                    showErrorDialog("Error", "Could not open project in Explorer.", e);
+                }
+            } else {
+                showErrorDialog("Error", "Project directory does not exist or Desktop is not supported.", null);
+            }
+        } else {
+            showErrorDialog("Error", "No project selected.", null);
+        }
+    }
+
+    private void showErrorDialog(String title, String header, Exception e) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        if (e != null) {
+            alert.setContentText(e.getMessage());
+        }
+        alert.showAndWait();
     }
 }
