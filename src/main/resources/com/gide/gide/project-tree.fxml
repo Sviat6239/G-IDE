@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.gide.gide.ProjectTreeController">
     <center>
-        <TreeView fx:id="projectTree"/>
+        <VBox>
+            <TextField fx:id="searchField" promptText="Search..."/>
+            <Button text="Refresh" onAction="#refreshTree"/>
+            <TreeView fx:id="projectTree"/>
+        </VBox>
     </center>
 </BorderPane>

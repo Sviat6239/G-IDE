@@ -37,7 +37,7 @@
     </center>
     <left>
         <VBox spacing="10" alignment="CENTER">
-            <Label text="G-IDE 0.0.1"/>
+            <Label text="G-IDE 0.0.2"/>
             <Label text="Projects"/>
             <Button text="Customize IDE" onAction="#customizeIDE">
                 <Tooltip text="Customize the IDE settings"/>
