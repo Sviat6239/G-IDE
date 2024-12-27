@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class NewProjectController {
     @FXML
@@ -22,6 +23,16 @@ public class NewProjectController {
     public void initialize() {
         String defaultLocation = System.getProperty("user.home") + "\\G-IDEProjects";
         projectLocationField.setText(defaultLocation);
+    }
+
+    @FXML
+    protected void browseLocation() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Project Location");
+        File selectedDirectory = directoryChooser.showDialog(new Stage());
+        if (selectedDirectory != null) {
+            projectLocationField.setText(selectedDirectory.getAbsolutePath());
+        }
     }
 
     @FXML
@@ -42,19 +53,9 @@ public class NewProjectController {
         }
     }
 
-    @FXML
-    protected void browseLocation() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Select Project Location");
-        File selectedDirectory = directoryChooser.showDialog(new Stage());
-        if (selectedDirectory != null) {
-            projectLocationField.setText(selectedDirectory.getAbsolutePath());
-        }
-    }
-
     private void openMainWindow(Path projectPath) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-window.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/gide/gide/main-window.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 800, 600);
             MainWindowController controller = fxmlLoader.getController();
             controller.loadProject(projectPath);
@@ -66,4 +67,5 @@ public class NewProjectController {
             e.printStackTrace();
         }
     }
+
 }

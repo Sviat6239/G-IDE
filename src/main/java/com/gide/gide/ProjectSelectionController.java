@@ -106,19 +106,16 @@ public class ProjectSelectionController {
     protected void renameProject() {
         String selectedProject = projectList.getSelectionModel().getSelectedItem();
         if (selectedProject != null) {
-            TextInputDialog dialog = new TextInputDialog(Paths.get(selectedProject).getFileName().toString());
+            TextInputDialog dialog = new TextInputDialog(selectedProject);
             dialog.setTitle("Rename Project");
             dialog.setHeaderText("Rename Project");
             dialog.setContentText("New name:");
-
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(newName -> {
-                Path source = Paths.get(selectedProject);
+            dialog.showAndWait().ifPresent(newName -> {
+                Path projectPath = Paths.get(projectLocationField.getText(), selectedProject);
+                Path newProjectPath = projectPath.resolveSibling(newName);
                 try {
-                    Path target = source.resolveSibling(newName);
-                    Files.move(source, target);
-                    projectList.getItems().set(projectList.getItems().indexOf(selectedProject), target.toString());
-                    saveProjects();
+                    Files.move(projectPath, newProjectPath);
+                    loadProjects();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -179,6 +176,19 @@ public class ProjectSelectionController {
                 if (file.isDirectory()) {
                     projectList.getItems().add(file.getName());
                 }
+            }
+        }
+    }
+
+    @FXML
+    protected void openProjectFolder() {
+        String selectedProject = projectList.getSelectionModel().getSelectedItem();
+        if (selectedProject != null) {
+            Path projectPath = Paths.get(projectLocationField.getText(), selectedProject);
+            try {
+                java.awt.Desktop.getDesktop().open(projectPath.toFile());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
