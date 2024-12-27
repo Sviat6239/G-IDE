@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.gide.gide.CodeEditorController">
+    <top>
+        <MenuBar>
+            <Menu text="File">
+                <MenuItem text="New Project" onAction="#newProject"/>
+                <MenuItem text="Open" onAction="#openFile"/>
+                <MenuItem text="Open Recent"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Close Project" onAction="#closeProject"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Save" onAction="#saveFile"/>
+                <MenuItem text="Save As..."/>
+                <MenuItem text="Revert"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Invalidate Caches / Restart"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Exit" onAction="#exit"/>
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+        <SplitPane>
+            <TreeView fx:id="projectTree"/>
+            <TextArea fx:id="textArea"/>
+        </SplitPane>
+    </center>
+</BorderPane>
