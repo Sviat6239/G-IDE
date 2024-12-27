@@ -1,5 +1,7 @@
 package com.gide.gide;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -42,6 +44,20 @@ public class ProjectSelectionController {
         String defaultLocation = System.getProperty("user.home") + "\\G-IDEProjects";
         projectLocationField.setText(defaultLocation);
 
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> filterProjects(newValue));
+
+    }
+
+    private void filterProjects(String query) {
+        projectList.getItems().clear();
+        File projectDir = Paths.get(System.getProperty("user.home"), "G-IDEProjects").toFile();
+        if (projectDir.exists() && projectDir.isDirectory()) {
+            for (File file : projectDir.listFiles()) {
+                if (file.isDirectory() && file.getName().toLowerCase().contains(query.toLowerCase())) {
+                    projectList.getItems().add(file.getName());
+                }
+            }
+        }
     }
 
     @FXML
@@ -172,7 +188,7 @@ public class ProjectSelectionController {
         }
     }
 
-    private void saveProjects() {
+    public void saveProjects() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PROJECTS_FILE))) {
             for (String project : projectList.getItems()) {
                 writer.write(project);
@@ -191,10 +207,17 @@ public class ProjectSelectionController {
                 while ((line = reader.readLine()) != null) {
                     projectList.getItems().add(line);
                 }
+                sortProjects();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void sortProjects() {
+        ObservableList<String> sortedList = FXCollections.observableArrayList(projectList.getItems());
+        FXCollections.sort(sortedList);
+        projectList.setItems(sortedList);
     }
 
     private void refreshProjectList() {
@@ -206,6 +229,7 @@ public class ProjectSelectionController {
                     projectList.getItems().add(file.getName());
                 }
             }
+            sortProjects();
         }
     }
 
