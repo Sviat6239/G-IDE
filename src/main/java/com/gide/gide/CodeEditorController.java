@@ -31,7 +31,6 @@ public class CodeEditorController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
             stage.showAndWait();
-            // Close the project selection window
             Stage mainStage = (Stage) textArea.getScene().getWindow();
             mainStage.close();
         } catch (IOException e) {

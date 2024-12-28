@@ -12,9 +12,7 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.gide.gide.ProjectSelectionController">
     <top>
         <HBox spacing="10" alignment="CENTER">
-            <TextField fx:id="searchField" promptText="Search Projects">
-                <Tooltip text="Enter project name to search"/>
-            </TextField>
+            <TextField fx:id="searchField" promptText="Search Projects"/>
             <Button text="New Project" onAction="#newProject">
                 <Tooltip text="Create a new project"/>
             </Button>
@@ -24,9 +22,10 @@
             <Button text="Clone Repository" onAction="#cloneRepository">
                 <Tooltip text="Clone a project from a repository"/>
             </Button>
-            <TextField fx:id="projectLocationField" promptText="Project Location">
-                <Tooltip text="Enter the location of the project"/>
-            </TextField>
+            <TextField fx:id="projectLocationField" promptText="Project Location"/>
+            <Button text="Browse" onAction="#browseLocation">
+                <Tooltip text="Browse project location"/>
+            </Button>
         </HBox>
     </top>
     <center>

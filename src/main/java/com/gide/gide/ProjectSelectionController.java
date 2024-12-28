@@ -1,5 +1,13 @@
 package com.gide.gide;
 
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -34,10 +42,13 @@ public class ProjectSelectionController {
     @FXML
     private TextField projectLocationField;
 
+    private static final String PROJECT_DIRECTORY = System.getProperty("user.home") + "\\G-IDEProjects";
     private static final String PROJECTS_FILE = "projects.txt";
+    private WatchService watchService;
 
     @FXML
     public void initialize() {
+        projectLocationField.setText(PROJECT_DIRECTORY);
         loadProjects();
         projectList.setOnMouseClicked(this::handleMouseClick);
 
@@ -46,6 +57,34 @@ public class ProjectSelectionController {
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> filterProjects(newValue));
 
+        startDirectoryWatcher();
+
+    }
+
+    private void startDirectoryWatcher() {
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+            Path path = Paths.get(PROJECT_DIRECTORY);
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+
+            Thread watchThread = new Thread(() -> {
+                try {
+                    WatchKey key;
+                    while ((key = watchService.take()) != null) {
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            Platform.runLater(this::loadProjects);
+                        }
+                        key.reset();
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+            watchThread.setDaemon(true);
+            watchThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void filterProjects(String query) {
@@ -200,17 +239,15 @@ public class ProjectSelectionController {
     }
 
     private void loadProjects() {
-        File file = new File(PROJECTS_FILE);
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    projectList.getItems().add(line);
+        projectList.getItems().clear();
+        File projectDir = new File(PROJECT_DIRECTORY);
+        if (projectDir.exists() && projectDir.isDirectory()) {
+            for (File file : projectDir.listFiles()) {
+                if (file.isDirectory()) {
+                    projectList.getItems().add(file.getName());
                 }
-                sortProjects();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            sortProjects();
         }
     }
 
